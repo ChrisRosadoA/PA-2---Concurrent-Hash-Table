@@ -1,7 +1,7 @@
 // Concurrent Hash Table struct definitions
 // Authors: Jazz Olario and Sophia Gnisci
 
-#include <stdint.h>;
+#include <stdint.h>
 
 typedef struct hash_struct
 {
@@ -12,7 +12,7 @@ typedef struct hash_struct
 } hashRecord;
 
 // Function Declarations
-uint32_t jenkins_one_at_a_time_hash(const uint8_t* key, size_t length);
+uint32_t jenkinsOneAtATime(const uint8_t* key, size_t length);
 void insert(uint8_t* key, uint32_t value);
 void deleteItem(uint8_t* key);
 uint32_t search(uint8_t* key);
