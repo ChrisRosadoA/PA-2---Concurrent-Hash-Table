@@ -2,7 +2,6 @@
 // Author: Sophia Gnisci
 
 #include "hashdb.h"
-#include <stdio.h>
 
 // Hash Function (Jenkin's One at a Time)
 // In: name (key) & length of name (length)
@@ -25,12 +24,50 @@ uint32_t jenkinsOneAtATime(const uint8_t* key, size_t length) {
 // In: name (key) & salary (value)
 void insert(uint8_t* key, uint32_t value) {
 
+    // compute hash value
+    size_t keyLen = strlen(key);
+    uint32_t hash = jenkinsOneAtATime(key, keyLen);
+
+    // aquire writer lock
+
+    // search linked list for hash
+
+        // hash found (update value)
+        if ( search(key) != NULL && search(key) != 0 ) {
+
+
+        // hash not found (create new node and insert)
+        } else {
+            
+        }
+
+    // release writer lock
+
+    return;
 }
 
 // Delete Key-Data Pair from Hash Table
 // In: name (key)
 void deleteItem(uint8_t* key) {
 
+    // compute hash value
+    size_t keyLen = strlen(key);
+    uint32_t hash = jenkinsOneAtATime(key, keyLen);
+
+    // aquire writer lock
+
+    // search linked list for hash
+
+        // hash found 
+        if ( search(key) != NULL && search(key) != 0 ) {
+
+            // delete node and free memory
+
+        }
+
+    // release writer lock
+
+    return;
 }
 
 // Search Based on Key
@@ -38,19 +75,35 @@ void deleteItem(uint8_t* key) {
 // Out: salary or NULL
 uint32_t search(uint8_t* key) {
 
+    // compute hash value
+    size_t keyLen = strlen(key);
+    uint32_t hash = jenkinsOneAtATime(key, keyLen);
+
+    // aquire reader lock
+
+    // search linked list for hash
+    uint32_t retval = 0;
+    int found = 0;
+
+        // hash found
+        if (found == 1)
+            retval = 1; // change to salary
+        
+        // hash not found
+        else
+            retval = NULL;
+    
+    // release reader lock
+
+    return retval;
 }
 
-// // Testing
+// // Initializes the Hash Table
+// void init(pthread_t hashTable) {
+
+// }
+
+// Testing
 // void main () {
-//     uint32_t hashValue = 0;
 
-//     hashValue = jenkinsOneAtATime("a", 1);
-
-//     // prints 0xca2e9442
-//     printf("\n\nHash of \"a\" is 0x%x", hashValue);
-
-//     hashValue = jenkinsOneAtATime("The quick brown fox jumps over the lazy dog", 43);
-
-//     // prints 0x519e91f5
-//     printf("\nHash of \"The quick brown fox jumps over the lazy dog\" is 0x%x\n", hashValue);
 // }

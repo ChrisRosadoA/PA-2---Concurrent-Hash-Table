@@ -2,6 +2,9 @@
 // Authors: Jazz Olario and Sophia Gnisci
 
 #include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+// #include <pthread.h> // only works for Linux
 
 typedef struct hash_struct
 {
@@ -16,3 +19,4 @@ uint32_t jenkinsOneAtATime(const uint8_t* key, size_t length);
 void insert(uint8_t* key, uint32_t value);
 void deleteItem(uint8_t* key);
 uint32_t search(uint8_t* key);
+// void init(pthread_t hashTable);
