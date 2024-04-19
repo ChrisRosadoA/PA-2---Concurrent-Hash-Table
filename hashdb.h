@@ -1,4 +1,4 @@
-// Concurrent Hash Table struct definitions
+// Concurrent Hash Table definitions
 // Authors: Jazz Olario and Sophia Gnisci
 
 #include <stdint.h>

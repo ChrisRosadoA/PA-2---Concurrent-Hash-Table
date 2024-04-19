@@ -36,15 +36,15 @@ uint32_t search(uint8_t* key) {
     // aquire reader lock
 
     // linked list is found at this index
-    if (concurrentHashTable[index] != NULL) {
+    if (concurrentHashTable[index]) {
         hashRecord* t = concurrentHashTable[index];
 
         // traverse linked list
-        while (t->next && !strcmp(t->name, key))
+        while (t->next && strcmp(t->name, key) != 0)
             t = t->next;
 
         // found key
-        if (strcmp(t->name, key))
+        if (strcmp(t->name, key) == 0)
             retval = t->salary;
     }
     
@@ -78,6 +78,7 @@ hashRecord* createNode(uint8_t* key, uint32_t value, uint32_t hashValue) {
 // Insert Into Hash table
 // In: name (key) & salary (value)
 void insert(uint8_t* key, uint32_t value) {
+    int insertNew = 1;
 
     // compute hash value and corresponding index
     size_t keyLen = strlen(key);
@@ -86,25 +87,33 @@ void insert(uint8_t* key, uint32_t value) {
 
     // aquire writer lock
 
-    // search linked list for hash
-    int foundValue = search(key);
+    // linked list is found at index
+    if (concurrentHashTable[index] != NULL) {
+        hashRecord* t = concurrentHashTable[index];
 
-    // hash found (update value)
-    if (foundValue > 0) {
+        // search linked list for hash
+        while (t->next && t->hash != hashValue)
+            t = t->next;
 
+        // update existing node
+        if (t->hash == hashValue) {
+            insertNew = 0;
+            t->salary = value;
+        }
+    }
 
-    // hash not found
-    } else {
+    // insert new node
+    if (insertNew == 1) {
 
         // create new node
         hashRecord* node = createNode(key, value, hashValue);
-
-        if (node == NULL)
-            return;
         
-
-
-    }
+        // insert
+        if (node != NULL) {
+            node->next = concurrentHashTable[index];
+            concurrentHashTable[index] = node;
+        }
+    } 
 
     // release writer lock
 
@@ -116,18 +125,37 @@ void insert(uint8_t* key, uint32_t value) {
 void deleteItem(uint8_t* key) {
 
     // compute hash value and corresponding index
-    size_t index = computeIndex(key);
+    size_t keyLen = strlen(key);
+    uint32_t hashValue = jenkinsOneAtATime(key, keyLen);
+    size_t index = hashValue % tableSize;
 
     // aquire writer lock
 
-    // search linked list for hash
+    // linked list is found at index
+    if (concurrentHashTable[index] != NULL) {
 
-        // hash found 
-        if ( search(key) != 0 && search(key) != 0 ) {
+        // delete beginning of list
+        if (concurrentHashTable[index]->hash == hashValue) {
+            hashRecord* temp = concurrentHashTable[index];
+            concurrentHashTable[index] = concurrentHashTable[index]->next;
+            free(temp);
 
-            // delete node and free memory
+        // delete in middle or end of list
+        } else {
+            hashRecord* t = concurrentHashTable[index];
+            
+            // search linked list for node previous to node to delete
+            while (t->next && t->next->hash != hashValue)
+                t = t->next;
 
+            // delete node
+            if (t->next && t->next->hash == hashValue) {
+                hashRecord* temp = t->next;
+                t->next = t->next->next;
+                free(temp);
+            }
         }
+    }
 
     // release writer lock
 
@@ -194,7 +222,6 @@ int isPowerOf2(int num) {
 
 
 
-
 // // Testing & Examples ------------------------------------------
 // int main () {
 
@@ -206,10 +233,27 @@ int isPowerOf2(int num) {
 //         exit(1);
 
 //     // insert
+//     insert("key1", 876543);
+//     insert("KEY1", 43322);
+//     insert("key2", 81653);
+//     insert("key3", 1234);
+//     insert("key3", 123456);
 
 //     // delete
+//     deleteItem("key2");
 
 //     // search
+//     uint32_t found1 = search("key2");
+//     if (found1 > 0) printf("\nSalary of %d has been found at key \"key2\"", found1);
+//     else printf("\nData at key \"key2\" does not exist");
+
+//     uint32_t found2 = search("KEY2");
+//     if (found2 > 0) printf("\nSalary of %d has been found at key \"KEY2\"", found2);
+//     else printf("\nData at key \"KEY2\" does not exist");
+
+//     uint32_t found3 = search("key3");
+//     if (found3 > 0) printf("\nSalary of %d has been found at key \"key3\"\n", found3);
+//     else printf("\nData at key \"key3s\" does not exist\n");
 
 //     // free memory!!!!
 //     free(concurrentHashTable);
