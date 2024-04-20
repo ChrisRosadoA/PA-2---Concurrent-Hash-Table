@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "hashdb.h"
 
 #define MAX_LINE_LENGTH 1000
+void display(hashRecord* t);
 
 int main() {
     FILE* file;
@@ -16,6 +18,13 @@ int main() {
     char* commandUserName;
     char* commandValue;
     int value;
+
+     //creating and initializing the table
+     tableSize = computeTableSize(15, 0.7);
+     concurrentHashTable = createTable();
+
+     if (concurrentHashTable == NULL)
+         exit(1);
 
     //char command[MAX_LINE_LENGTH]; // Variable to store the command
 
@@ -69,7 +78,8 @@ int main() {
             /*printf("Value is: %d", value);
             printf("\n");*/
 
-            //******Place "insert" Function Here******
+            //******Place "insert" Function Call Here******
+            insert(commandUserName,value);
           
         }
 
@@ -86,6 +96,7 @@ int main() {
             printf("\n");*/
 
             //*****Place "delete" Function Here******
+            deleteItem(commandUserName);
         }
   
         //PRINT
@@ -98,9 +109,15 @@ int main() {
         return 1;
     }
 
-    // Write "test" to the file
-    fprintf(file, "test");
-
+    //Print to output.txt Unsorted
+    printf("Hash Table Contents:\n");
+    for (int i = 0; i < tableSize; i++) {
+        hashRecord* entry = concurrentHashTable[i];
+        while (entry != NULL) {
+            display(entry);
+            entry = entry->next;
+        }
+    }
     // Close the file
     fclose(file);
      
@@ -108,11 +125,13 @@ int main() {
             
         //SEARCH
         else if (strcmp(token, "search") == 0) {
-            commandStr = "search";
-            //printf("Command stored: %s\n", commandStr);
-
+            
+            token = strtok_s(NULL, delimiters, &nextToken);
+            commandUserName = token;
 
             //******Place "search" Function Here******
+            search(commandUserName);
+
         }  
             
         else {
@@ -127,3 +146,15 @@ int main() {
 
     return 0;
 }
+
+
+//Functions
+void display(hashRecord* t)
+{
+  while(t!=NULL)
+  {
+    printf("\n%x,%s,%d ", t->hash, t->name, t->salary);
+    t= t->next;
+  }
+}
+
